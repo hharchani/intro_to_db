@@ -44,14 +44,16 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
 </head>
 <body>
     <?php
-    
+
     include("config.php");
     $columns = array(
         "name",
         "address",
         "contact_no"
     );
-    
+    if (isset($_POST["delete"])) {
+        $DB->query("DELETE FROM `wholesalers` WHERE `id` = $_POST[delete]");
+    }
     if (isset($_POST["formSubmitted"])) {
         $validData = true;
         foreach($columns as $key) {
@@ -74,7 +76,7 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             }
         }
     }
-    
+
     ?>
     <div class="container">
         <form action="add_wholesaler.php" method="POST">
@@ -82,7 +84,7 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
                 <span>Wholesaler Name</span>
                 <input type="text" name="name" placeholder="Name" id="name" required/>
             </label>
-            
+
             <label for="address">
                 <span>Wholesaler's address</span>
                 <textarea name="address" placeholder="Address here" id="address"></textarea>
@@ -92,6 +94,31 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
                 <input type="number" name="contact_no" placeholder="Contact number" id="contact_no" />
             </label>
             <input type="submit" name="formSubmitted" />
+        </form>
+
+        <form action='' method='post'>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Contact No</th>
+                </tr>
+                <?php
+                    $rows = $DB->fetchDataFromTable("wholesalers", ["id", "name", "address", "contact_no"], "1");
+                    foreach ($rows as $row) {
+                ?>
+                    <tr>
+                        <td><?php echo $row["id"]; ?></td>
+                        <td><?php echo $row["name"]; ?></td>
+                        <td><?php echo $row["address"]; ?></td>
+                        <td><?php echo $row["contact_no"]; ?></td>
+                        <td><button type='submit' name='delete' value='<?php echo $row["id"]; ?>'>Delete</button></td>
+                    </tr>
+                <?php
+                    }
+                ?>
+            </table>
         </form>
     </div>
 </body>

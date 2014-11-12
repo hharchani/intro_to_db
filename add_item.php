@@ -44,7 +44,7 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
 </head>
 <body>
     <?php
-    
+
     include("config.php");
 
     $columns = array(
@@ -53,7 +53,9 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
         "description",
         "unit"
     );
-    
+    if (isset($_POST["delete"])) {
+        $DB->query("DELETE FROM `items` WHERE `id` = $_POST[delete]");
+    }
     if (isset($_POST["formSubmitted"])) {
         $validData = true;
         foreach($columns as $key) {
@@ -76,7 +78,7 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             }
         }
     }
-    
+
     ?>
 
     <div class="container">
@@ -99,7 +101,37 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             </label>
             <input type="submit" name="formSubmitted" />
         </form>
+
+        <form action='' method='post'>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Stock</th>
+                    <th>Unit</th>
+                </tr>
+                <?php
+                    $rows = $DB->fetchDataFromTable("items", ["id", "name", "price", "description", "stock", "unit"], "1");
+                    foreach ($rows as $row) {
+                ?>
+                    <tr>
+                        <td><?php echo $row["id"]; ?></td>
+                        <td><?php echo $row["name"]; ?></td>
+                        <td><?php echo $row["price"]; ?></td>
+                        <td><?php echo $row["description"]; ?></td>
+                        <td><?php echo $row["stock"]; ?></td>
+                        <td><?php echo $row["unit"]; ?></td>
+                        <td><button type='submit' name='delete' value='<?php echo $row["id"]; ?>'>Delete</button></td>
+                    </tr>
+                <?php
+                    }
+                ?>
+            </table>
+        </form>
     </div>
 
 </body>
 </html>
+

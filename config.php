@@ -15,17 +15,17 @@ class InsertEntity {
     public
     $keysArray = array(),
     $valuesArray = array();
-    
+
     function getKeys() {
         return "(" . join(',', $this->keysArray) .")";
     }
-    
+
     function getValues() {
         return "(" . join(",", $this->valuesArray) .")";
     }
 }
 
-class InsertSingleEntity extends InsertEntity {    
+class InsertSingleEntity extends InsertEntity {
     function add($key, $value) {
         $this->keysArray[] = $key;
         if (gettype($value) == "string") {
@@ -41,7 +41,7 @@ class InsertSingleEntity extends InsertEntity {
 class InsertMultiEntity extends InsertEntity{
     private
     $keyCount;
-    
+
     function __construct($array) {
         if (gettype($array) == "array") {
             $this->keysArray = $array;
@@ -51,7 +51,7 @@ class InsertMultiEntity extends InsertEntity{
         }
         $this->keysCount = count($this->keysArray);
     }
-    
+
     function add($array) {
         if (gettype($array) == "array") {
             $this->valuesArray[] = "(" . join(",", $array) . ")";
@@ -87,7 +87,9 @@ class DAL {
         $columns = join(", ", $arrayOfColumns);
         $result = $this->mysqli->query("SELECT {$columns} FROM {$table} WHERE ".$whereCondition);
         $rows = array();
-        while($rows[] = $result->fetch_assoc());
+        while($row = $result->fetch_assoc()){
+            $rows[] = $row;
+        }
         return $rows;
     }
     function fetchDataAsJson($table, /* unique */ $keyCol, $valCol, $whereCondition) {
@@ -104,6 +106,9 @@ class DAL {
         else {
             return json_encode( array() );
         }
+    }
+    function query($sql) {
+        return $this->mysqli->query($sql);
     }
 }
 $DB = new DAL();
