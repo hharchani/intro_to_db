@@ -54,6 +54,9 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
     if (isset($_POST["delete"])) {
         $DB->query("DELETE FROM `customers` WHERE `id` = $_POST[delete]");
     }
+    if (isset($_POST["update"])) {
+        $DB->query("UPDATE `customers` SET `name` = '$_POST[name]', `address` = '$_POST[address]', `contact_no` = '$_POST[contact_no]' WHERE `id` = $_POST[update]");
+    }
     if (isset($_POST["formSubmitted"])) {
         $validData = true;
         foreach($columns as $key) {
@@ -96,10 +99,9 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             <input type="submit" name="formSubmitted" />
         </form>
 
-        <form action='' method='post'>
+
             <table>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Address</th>
                     <th>Contact No</th>
@@ -109,17 +111,18 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
                     foreach ($rows as $row) {
                 ?>
                     <tr>
-                        <td><?php echo $row["id"]; ?></td>
-                        <td><?php echo $row["name"]; ?></td>
-                        <td><?php echo $row["address"]; ?></td>
-                        <td><?php echo $row["contact_no"]; ?></td>
+                        <form action='' method='post'>
+                        <td><input name='name' size=25 value='<?php echo $row["name"]; ?>' /></td>
+                        <td><input name='address' size=25 value='<?php echo $row["address"]; ?>' /></td>
+                        <td><input type='number' name='contact_no' value='<?php echo $row["contact_no"]; ?>' /></td>
                         <td><button type='submit' name='delete' value='<?php echo $row["id"]; ?>'>Delete</button></td>
+                        <td><button type='submit' name='update' value='<?php echo $row["id"]; ?>'>Update</button></td>
+                        </form>
                     </tr>
                 <?php
                     }
                 ?>
             </table>
-        </form>
     </div>
 </body>
 </html>
