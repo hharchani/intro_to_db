@@ -3,57 +3,109 @@
 #####################################################################
 // The following lines are for error reporting. Remove on production.
 error_reporting(E_ALL);
-ini_set('display_errors', 1);// */
+ini_set("display_errors", 1);// */
 #####################################################################
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'intro');
-define('DB_PASS', 'dbproject');
-define('DB_NAME', 'intro_to_db');
-
-$DB=mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
-if (mysqli_connect_errno()){
-    echo "Failed to connect to MySQL: " . mysqli_connect_error();
-    $DB=false;
-}
+define("DB_HOST", "localhost");
+define("DB_USER", "intro");
+define("DB_PASS", "dbproject");
+define("DB_NAME", "intro_to_db");
 
 class InsertEntity {
     public
-    $datatypeFormat = "",
-    $keyArray = array(),
-    $valueArray = array();
+    $keysArray = array(),
+    $valuesArray = array();
     
-    function __construct() {
-    }
-    
-    function add($key, $val, $datatype) {
-        $this->datatypeFormat .= $datatype;
-        $this->keyArray[] = $key;
-        $this->valueArray[] = $val;
-    }
-    function getValues($query) {
-        $starting = array($query, $this->datatypeFormat);
-        $refs = array();
-        foreach($this->valueArray as $key => $value)
-            $refs[$key] = &$this->valueArray[$key];
-        return array_merge($starting, $refs);
-    }
     function getKeys() {
-        return join(',', $this->keyArray);
+        return "(" . join(',', $this->keysArray) .")";
     }
-    function getQuestionMarks() {
-        $c = count($this->keyArray);
-        return substr( str_repeat('?,', $c) , 0, $c*2-1);
+    
+    function getValues() {
+        return "(" . join(",", $this->valuesArray) .")";
     }
 }
 
-function insertDataIntoTable($table, $insertEntity) {
-    global $DB;
-    $query = mysqli_prepare($DB, 'INSERT INTO `'.$table.'` ('.$insertEntity->getKeys().') VALUES('.$insertEntity->getQuestionMarks().')');
-    
-    call_user_func_array("mysqli_stmt_bind_param", $insertEntity->getValues($query));
-    
-    if ( !mysqli_stmt_execute($query) ) {
-        die("Some error occurred");
+class InsertSingleEntity extends InsertEntity {    
+    function add($key, $value) {
+        $this->keysArray[] = $key;
+        if (gettype($value) == "string") {
+            $this->valuesArray[] = '"'.$value.'"';
+        }
+        else {
+            $this->valuesArray[] = $value;
+        }
+        return $this;
     }
 }
+
+class InsertMultiEntity extends InsertEntity{
+    private
+    $keyCount;
+    
+    function __construct($array) {
+        if (gettype($array) == "array") {
+            $this->keysArray = $array;
+        }
+        else {
+            $this->keysArray = func_get_args();
+        }
+        $this->keysCount = count($this->keysArray);
+    }
+    
+    function add($array) {
+        if (gettype($array) == "array") {
+            $this->valuesArray[] = "(" . join(",", $array) . ")";
+        }
+        else {
+            $valueCount = func_num_args();
+            if ($valueCount != $this->keysCount) {
+                echo ("Insufficient values provided");
+                return this;
+            }
+            $this->valuesArray[] = "(" . join(",", func_get_args()) . ")";
+        }
+        return this;
+    }
+}
+
+class DAL {
+    private $mysqli;
+    function __construct() {
+        $this->mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if ($this->mysqli->connect_errno) {
+            die("Failed to connect to MySQL: " . $mysqli->connect_error);
+        }
+    }
+    function insertDataIntoTable($table, $insertEntity) {
+        $res = $this->mysqli->query("INSERT INTO `".$table."` ".$insertEntity->getKeys()." VALUES ".$insertEntity->getValues());
+        if ( !$res ) {
+            return false;
+        }
+        return true;
+    }
+    function fetchDataFromTable($table, $arrayOfColumns, $whereCondition) {
+        $columns = join(", ", $arrayOfColumns);
+        $result = $this->mysqli->query("SELECT {$columns} FROM {$table} WHERE ".$whereCondition);
+        $rows = array();
+        while($rows[] = $result->fetch_assoc());
+        return $rows;
+    }
+    function fetchDataAsJson($table, /* unique */ $keyCol, $valCol, $whereCondition) {
+        $result = $this->mysqli->query("SELECT {$keyCol}, {$valCol} FROM {$table} WHERE {$whereCondition} LIMIT 20");
+        echo ("SELECT {$keyCol}, {$valCol} FROM {$table} WHERE ".$whereCondition);
+        $rows = array();
+        if (! $result ) {
+            echo gettype($result->fetch_assoc);
+            while($row = $result->fetch_assoc()) {
+                $rows[$row[$keyCol]] = $row[$valCol];
+            }
+            return json_encode($rows);
+        }
+        else {
+            return json_encode( array() );
+        }
+    }
+}
+$DB = new DAL();
+
+

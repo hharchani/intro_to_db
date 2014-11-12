@@ -46,41 +46,39 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
     <?php
     
     include("config.php");
-    /*
-    $a = new InsertEntity();
-    $a->add("name", "Pears Soap", "s");
-    $a->add("price", 25.00, "d");
-    $a->add("description", "Pears Soap 250g", "s");
-    $a->add("unit", "pc", "s");
-    insertDataIntoTable("items", $a);
-    */
+
     $columns = array(
-        "name" => "s",
-        "price" => "d",
-        "description" => "s",
-        "unit" =>"s"
+        "name",
+        "price",
+        "description",
+        "unit"
     );
     
     if (isset($_POST["formSubmitted"])) {
         $validData = true;
-        foreach($columns as $key=>$value) {
+        foreach($columns as $key) {
             if ( ! isset($_POST[$key]) ) {
-                echo "<div>Invalid Data</div>".$key;
+                echo "<div>Invalid Data ".$key."</div>";
                 $validData = false;
                 break;
             }
         }
         if ($validData) {
-            $entity = new InsertEntity();
-            foreach($columns as $key=>$value) {
-                $entity->add($key, $_POST[$key], $value);
+            $entity = new InsertSingleEntity($columns);
+            foreach($columns as $columnName) {
+                $entity->add($columnName, $_POST[$columnName]);
             }
-            insertDataIntoTable("items", $entity);
-            echo "<div>Successfully Submitted data</div>";
+            if ($DB->insertDataIntoTable("items", $entity)) {
+                echo "<div>Successfully Submitted data</div>";
+            }
+            else {
+                echo "<div>Some error occured</div>";
+            }
         }
     }
     
     ?>
+
     <div class="container">
         <form action="add_item.php" method="POST">
             <label for="name">
@@ -93,7 +91,7 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             </label>
             <label for="description">
                 <span>Item Description</span>
-                <textarea name="description" placeholder="Description here" id="description" required></textarea>
+                <textarea name="description" placeholder="Description here" id="description"></textarea>
             </label>
             <label for="unit">
                 <span>Item Unit</span>
@@ -102,5 +100,6 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             <input type="submit" name="formSubmitted" />
         </form>
     </div>
+
 </body>
 </html>
