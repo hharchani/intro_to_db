@@ -57,14 +57,14 @@ a, a:active, a:link, a:visited {
         <div>
             <?php
                 $cat = array(
-                    "add_item" => "Add an item",
-                    "add_wholesaler" => "Add a Wholesaler",
-                    "add_customer" => "Add a Customer",
+                    "add_item" => "Manage item",
+                    "add_wholesaler" => "Manage Wholesalers",
+                    "add_customer" => "Manage Customer",
                     "purchase" => "Purchase",
                     "sale" => "Sale",
                     "purchase_payment" => "Purchase payment",
                 );
-            
+
             foreach($cat as $file=>$title)
             echo    '<div class="tile">
                         <a href="'.$file.'.php">
