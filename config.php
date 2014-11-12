@@ -69,7 +69,7 @@ class InsertMultiEntity extends InsertEntity{
 }
 
 class DAL {
-    private $mysqli;
+    public $mysqli;
     function __construct() {
         $this->mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($this->mysqli->connect_errno) {

@@ -56,6 +56,10 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
     if (isset($_POST["delete"])) {
         $DB->query("DELETE FROM `items` WHERE `id` = $_POST[delete]");
     }
+    if (isset($_POST["update"])) {
+        $DB->query("UPDATE `items` SET `name` = '$_POST[name]', `price` = $_POST[price], `description` = '$_POST[description]', `unit` = '$_POST[unit]' WHERE `id` = $_POST[update]");
+        var_dump($DB->mysqli->error);
+    }
     if (isset($_POST["formSubmitted"])) {
         $validData = true;
         foreach($columns as $key) {
@@ -102,7 +106,6 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             <input type="submit" name="formSubmitted" />
         </form>
 
-        <form action='' method='post'>
             <table>
                 <tr>
                     <th>ID</th>
@@ -117,13 +120,16 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
                     foreach ($rows as $row) {
                 ?>
                     <tr>
+                        <form action='' method='post'>
                         <td><?php echo $row["id"]; ?></td>
-                        <td><?php echo $row["name"]; ?></td>
-                        <td><?php echo $row["price"]; ?></td>
-                        <td><?php echo $row["description"]; ?></td>
+                        <td><input name='name' size=25 value='<?php echo $row["name"]; ?>' /></td>
+                        <td><input type='number' step='0.01' style='width:107px' name='price' value='<?php echo $row["price"]; ?>' /></td>
+                        <td><input name='description' value='<?php echo $row["description"]; ?>' /></td>
                         <td><?php echo $row["stock"]; ?></td>
-                        <td><?php echo $row["unit"]; ?></td>
+                        <td><input name='unit' size=2 value='<?php echo $row["unit"]; ?>' /></td>
                         <td><button type='submit' name='delete' value='<?php echo $row["id"]; ?>'>Delete</button></td>
+                        <td><button type='submit' name='update' value='<?php echo $row["id"]; ?>'>Update</button></td>
+                        </form>
                     </tr>
                 <?php
                     }
