@@ -58,7 +58,6 @@ input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
     }
     if (isset($_POST["update"])) {
         $DB->query("UPDATE `items` SET `name` = '$_POST[name]', `price` = $_POST[price], `description` = '$_POST[description]', `unit` = '$_POST[unit]' WHERE `id` = $_POST[update]");
-        var_dump($DB->mysqli->error);
     }
     if (isset($_POST["formSubmitted"])) {
         $validData = true;
