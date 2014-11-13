@@ -63,6 +63,7 @@ a, a:active, a:link, a:visited {
                     "purchase" => "Purchase",
                     "sale" => "Sale",
                     "payments" => "Purchase payment",
+                    "sale_report" => "Sale report",
                 );
 
             foreach($cat as $file=>$title)

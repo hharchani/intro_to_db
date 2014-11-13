@@ -69,14 +69,14 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
 
     if ( isset($_POST["formSubmitted"]) ) {
         if ( isset($_POST["customer_id"]) && isset($_POST["items"]) ) {
-            $lastId = 
+            $lastId =
             $DB->insertDataIntoTable("sale",
                 (new InsertSingleEntity())
                 ->add("customer_id", $_POST["customer_id"])
                 ->add("discount", (float)($_POST["discount"]) )
                 ->add("taxrate", (float)$_POST["taxrate"])
             )->insert_id;
-            
+
             $items = $_POST["items"];
             $quantity = $_POST["quantity"];
             $entity = new InsertMultiEntity("sale_id", "item_id", "quantity");
@@ -85,7 +85,7 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
                 $entity->add($lastId, $items[$i], $quantity[$i]);
                 $DB->query("UPDATE `items` SET `stock`=`stock`-".$quantity[$i]." WHERE `id`=".$items[$i]);
             }
-            $DB->insertDataIntoTable("purchase_entity", $entity);
+            $DB->insertDataIntoTable("sale_entity", $entity);
             echo "<div class='flash'>Successfully submitted data</div>";
         }
         else {
@@ -96,9 +96,9 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
     ?>
     <div class="container">
         <h2>Make a sale</h2>
-        
+
         <form action="sale.php" class="form-horizontal" method="POST">
-            
+
             <div id="customer-wrapper">
                 <select type="text" id="customer_name" class="form-control" placeholder="Customer's Name" name="customer_id" required>
                     <?php
@@ -164,7 +164,7 @@ $(function(){
         ItemTemplate.hide().clone().appendTo('#item-group').slideDown(200);
     }
     $('#add-more-items').click(addItems);
-    
+
 });
 
 function itemchange(sel) {
