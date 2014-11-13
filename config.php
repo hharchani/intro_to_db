@@ -97,7 +97,6 @@ class DAL {
     }
     function fetchDataAsJson($table, /* unique */ $keyCol, $valCol, $whereCondition) {
         $result = $this->mysqli->query("SELECT {$keyCol}, {$valCol} FROM {$table} WHERE {$whereCondition} LIMIT 20");
-        echo ("SELECT {$keyCol}, {$valCol} FROM {$table} WHERE ".$whereCondition);
         $rows = array();
         if (! $result ) {
             echo gettype($result->fetch_assoc);
