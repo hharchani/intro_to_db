@@ -69,14 +69,14 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
 
     if ( isset($_POST["formSubmitted"]) ) {
         if ( isset($_POST["wholesaler_id"]) && isset($_POST["items"]) ) {
-            $lastId = 
+            $lastId =
             $DB->insertDataIntoTable("purchase",
                 (new InsertSingleEntity())
                 ->add("wholesaler_id", $_POST["wholesaler_id"])
                 ->add("discount", (float)($_POST["discount"]) )
                 ->add("taxrate", (float)$_POST["taxrate"])
             )->insert_id;
-            
+
             $items = $_POST["items"];
             $quantity = $_POST["quantity"];
             $price = $_POST["price"];
@@ -136,7 +136,7 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
                 <div class="col-sm-7"></div>
                 <div class="col-sm-2 control-label"><label>Discount %</label></div>
                 <div class="col-sm-2">
-                    <input name="discount" class="total-quantity form-control" value="0" type="number" placeholder="Discount %" step="0.01" min="0" required>
+                    <input name="discount" class="total-quantity form-control" type="number" placeholder="Discount %" value="0" step="0.01" min="0" required>
                 </div>
             </div>
             <div class="form-group">
@@ -164,7 +164,7 @@ $(function(){
         ItemTemplate.hide().clone().appendTo('#item-group').slideDown(200);
     }
     $('#add-more-items').click(addItems);
-    
+
 });
 
 function itemchange(sel) {

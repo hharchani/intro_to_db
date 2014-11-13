@@ -62,7 +62,7 @@ a, a:active, a:link, a:visited {
                     "add_customer" => "Manage Customer",
                     "purchase" => "Purchase",
                     "sale" => "Sale",
-                    "purchase_payment" => "Purchase payment",
+                    "payments" => "Purchase payment",
                 );
 
             foreach($cat as $file=>$title)
