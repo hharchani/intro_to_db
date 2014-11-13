@@ -84,7 +84,10 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
             $c = count($items);
             for($i=0; $i < $c; $i++) {
                 $entity->add($lastId, $items[$i], $quantity[$i], $price[$i]);
+                $DB->query("UPDATE `items` SET `stock`=`stock`+".$quantity[$i]." WHERE `id`=".$items[$i]);
             }
+            $DB->insertDataIntoTable("purchase_entity", $entity);
+            
             echo "<div class='flash'>Successfully submitted data</div>";
         }
         else {
@@ -130,19 +133,22 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
             </div>
             <button id="add-more-items" class="btn btn-success" type="button"><span class="glyphicon glyphicon-plus"></span></button>
             <div class="form-group">
-                <div class="col-sm-9"></div>
+                <div class="col-sm-7"></div>
+                <div class="col-sm-2 control-label"><label>Discount %</label></div>
                 <div class="col-sm-2">
-                    <input name="discount" class="total-quantity form-control" type="number" placeholder="Discount %" step="0.01" min="0" required>
+                    <input name="discount" class="total-quantity form-control" value="0" type="number" placeholder="Discount %" step="0.01" min="0" required>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-9"></div>
+                <div class="col-sm-7"></div>
+                <div class="col-sm-2 control-label"><label>Tax %</label></div>
                 <div class="col-sm-2">
-                    <input name="taxrate" class="total-quantity form-control" type="number" placeholder="Tax %" step="0.01" min="0" required>
+                    <input name="taxrate" class="total-quantity form-control" value="0" type="number" placeholder="Tax %" step="0.01" min="0" required>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-9"></div>
+                <div class="col-sm-7"></div>
+                <div class="col-sm-2 control-label"><label>Grand Total</label></div>
                 <div class="col-sm-2">
                     <input class="total-quantity form-control" type="number" placeholder="Grand Total" disabled>
                 </div>

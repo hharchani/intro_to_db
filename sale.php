@@ -83,7 +83,9 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
             $c = count($items);
             for($i=0; $i < $c; $i++) {
                 $entity->add($lastId, $items[$i], $quantity[$i]);
+                $DB->query("UPDATE `items` SET `stock`=`stock`-".$quantity[$i]." WHERE `id`=".$items[$i]);
             }
+            $DB->insertDataIntoTable("purchase_entity", $entity);
             echo "<div class='flash'>Successfully submitted data</div>";
         }
         else {
@@ -113,9 +115,9 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
                     <div class="col-sm-4">
                         <select  class="form-control" name='items[]' type="text" placeholder="Item name" onchange="itemchange(this)" required>
                             <?php
-                                $rows = $DB->fetchDataFromTable("items", ["id", "name", "unit", "price"], "1");
+                                $rows = $DB->fetchDataFromTable("items", ["id", "name", "unit", "price", "stock"], "1");
                                 foreach ($rows as $row) {
-                                    echo "<option data-price='$row[price]' value='$row[id]' data-unit='$row[unit]'>$row[name]</option>";
+                                    echo "<option data-price='$row[price]' value='$row[id]' data-unit='$row[unit]'>$row[name] (Stock: $row[stock]$row[unit])</option>";
                                 }
                             ?>
                         </select>
@@ -148,7 +150,7 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
                 <div class="col-sm-7"></div>
                 <div class="col-sm-2 control-label"><label>Grand Total</label></div>
                 <div class="col-sm-2">
-                    <input class="total-quantity form-control" type="number" placeholder="Grand Total" disabled>
+                    <input class="grand-total form-control" type="number" placeholder="Grand Total" disabled>
                 </div>
             </div>
             <button name="formSubmitted" value="" type="submit" class="btn btn-lg btn-block btn-primary">Done</button>
@@ -169,12 +171,18 @@ function itemchange(sel) {
     sel = $(sel);
     console.log(sel.find(":selected").data('unit'));
     sel.closest(".item").find(".unit").val(sel.find(":selected").data('unit'));
+    sel.closest(".item").find(".price").val(sel.find(":selected").data('price'));
 }
 
 function total(sel) {
     sel = $(sel);
     item = sel.closest(".item");
     item.find(".total").val(parseFloat(parseFloat(item.find('.quantity').val()) * parseFloat(item.find('.price').val())));
+    $('.grand-total').val(0);
+    $('.total').each(function(){
+        var g = $('.grand-total').val();
+        $('.grand-total').val( parseFloat($(this).val()) + parseFloat(g)  );
+    });
 }
 function removeThisRow() {
     $(this).closest(".item").slideUp(200, function(){
