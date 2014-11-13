@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Purchase</title>
+    <title>Sale</title>
     <link href='//fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
     <meta charset="utf-8" />
 
@@ -68,22 +68,21 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
     include("config.php");
 
     if ( isset($_POST["formSubmitted"]) ) {
-        if ( isset($_POST["wholesaler_id"]) && isset($_POST["items"]) ) {
+        if ( isset($_POST["customer_id"]) && isset($_POST["items"]) ) {
             $lastId = 
-            $DB->insertDataIntoTable("purchase",
+            $DB->insertDataIntoTable("sale",
                 (new InsertSingleEntity())
-                ->add("wholesaler_id", $_POST["wholesaler_id"])
+                ->add("customer_id", $_POST["customer_id"])
                 ->add("discount", (float)($_POST["discount"]) )
                 ->add("taxrate", (float)$_POST["taxrate"])
             )->insert_id;
             
             $items = $_POST["items"];
             $quantity = $_POST["quantity"];
-            $price = $_POST["price"];
-            $entity = new InsertMultiEntity("purchase_id", "item_id", "quantity", "price");
+            $entity = new InsertMultiEntity("sale_id", "item_id", "quantity");
             $c = count($items);
             for($i=0; $i < $c; $i++) {
-                $entity->add($lastId, $items[$i], $quantity[$i], $price[$i]);
+                $entity->add($lastId, $items[$i], $quantity[$i]);
             }
             echo "<div class='flash'>Successfully submitted data</div>";
         }
@@ -94,12 +93,14 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
 
     ?>
     <div class="container">
-        <h2>Add a purchase</h2>
-        <form action="purchase.php" class="form-horizontal" method="POST">
-            <div id="wholesaler-wrapper">
-                <select type="text" id="wholesaler_name" class="form-control" placeholder="Wholesaler's Name" name="wholesaler_id" required>
+        <h2>Make a sale</h2>
+        
+        <form action="sale.php" class="form-horizontal" method="POST">
+            
+            <div id="customer-wrapper">
+                <select type="text" id="customer_name" class="form-control" placeholder="Customer's Name" name="customer_id" required>
                     <?php
-                        $rows = $DB->fetchDataFromTable("wholesalers", ["id", "name"], "1");
+                        $rows = $DB->fetchDataFromTable("customers", ["id", "name"], "1");
                         foreach ($rows as $row) {
                             echo "<option value='$row[id]'>$row[name]</option>";
                         }
@@ -114,7 +115,7 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
                             <?php
                                 $rows = $DB->fetchDataFromTable("items", ["id", "name", "unit", "price"], "1");
                                 foreach ($rows as $row) {
-                                    echo "<option value='$row[id]' data-unit='$row[unit]'>$row[name] (MRP: $row[price])</option>";
+                                    echo "<option data-price='$row[price]' value='$row[id]' data-unit='$row[unit]'>$row[name]</option>";
                                 }
                             ?>
                         </select>
@@ -130,19 +131,22 @@ input:-moz-placeholder { font-family: "Raleway", sans-serif; }
             </div>
             <button id="add-more-items" class="btn btn-success" type="button"><span class="glyphicon glyphicon-plus"></span></button>
             <div class="form-group">
-                <div class="col-sm-9"></div>
+                <div class="col-sm-7"></div>
+                <div class="col-sm-2 control-label"><label>Discount %</label></div>
                 <div class="col-sm-2">
-                    <input name="discount" class="total-quantity form-control" type="number" placeholder="Discount %" step="0.01" min="0" required>
+                    <input name="discount" class="total-quantity form-control" value="0" type="number" placeholder="Discount %" step="0.01" min="0" required>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-9"></div>
+                <div class="col-sm-7"></div>
+                <div class="col-sm-2 control-label"><label>Tax %</label></div>
                 <div class="col-sm-2">
-                    <input name="taxrate" class="total-quantity form-control" type="number" placeholder="Tax %" step="0.01" min="0" required>
+                    <input name="taxrate" class="total-quantity form-control" value="0" type="number" placeholder="Tax %" step="0.01" min="0" required>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-9"></div>
+                <div class="col-sm-7"></div>
+                <div class="col-sm-2 control-label"><label>Grand Total</label></div>
                 <div class="col-sm-2">
                     <input class="total-quantity form-control" type="number" placeholder="Grand Total" disabled>
                 </div>

@@ -64,7 +64,10 @@ class InsertMultiEntity extends InsertEntity{
             }
             $this->valuesArray[] = "(" . join(",", func_get_args()) . ")";
         }
-        return this;
+        return $this;
+    }
+    function getValues() {
+        return join(",", $this->valuesArray);
     }
 }
 
@@ -79,9 +82,9 @@ class DAL {
     function insertDataIntoTable($table, $insertEntity) {
         $res = $this->mysqli->query("INSERT INTO `".$table."` ".$insertEntity->getKeys()." VALUES ".$insertEntity->getValues());
         if ( !$res ) {
-            return false;
+            echo "Some error occured". $this->mysqli->error;
         }
-        return true;
+        return $this->mysqli;
     }
     function fetchDataFromTable($table, $arrayOfColumns, $whereCondition) {
         $columns = join(", ", $arrayOfColumns);
